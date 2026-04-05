@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Напоминалка ДР отряда — московское время</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f7ff 0%, #e9eef5 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            color: #4a627a;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-date {
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        .moscow-clock {
+            background: #1e2f3f;
+            color: white;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .upcoming-section {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .upcoming-header {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+            border-left: 5px solid #ff7b2c;
+            padding-left: 1rem;
+        }
+
+        .upcoming-header h2 {
+            font-size: 1.7rem;
+            color: #1f2e4a;
+            font-weight: 700;
+        }
+
+        .upcoming-header span {
+            background: #ffedd5;
+            color: #c2410c;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .upcoming-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .birthday-card {
+            background: #fef9f0;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #ffe4c4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .birthday-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .card-icon {
+            font-size: 2.8rem;
+            background: #fff0e0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60px;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-info h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .card-info p {
+            color: #6c7a8e;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .days-badge {
+            background: #ff7b2c;
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .days-badge.today {
+            background: #e03a3a;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); background: #c92a2a; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .toolbar {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            flex: 2;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 60px;
+            padding: 0.3rem 1rem;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 0.7rem 0.5rem;
+            width: 100%;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-box span {
+            color: #7c8ea0;
+        }
+
+        .sort-group {
+            display: flex;
+            gap: 0.8rem;
+            background: #f1f5f9;
+            padding: 0.3rem 0.8rem;
+            border-radius: 60px;
+        }
+
+        .sort-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4a5568;
+        }
+
+        .sort-btn.active {
+            background: #2a5298;
+            color: white;
+            box-shadow: 0 2px 8px rgba(42,82,152,0.3);
+        }
+
+        .result-count {
+            font-size: 0.85rem;
+            color: #3a5a8c;
+            font-weight: 500;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 1.8rem;
+            overflow-x: auto;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            padding: 0 0 0.2rem 0;
+        }
+
+        .birthday-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            min-width: 680px;
+        }
+
+        .birthday-table th {
+            background: #f8fafd;
+            padding: 1rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: #1e2f41;
+            border-bottom: 2px solid #e2edf7;
+        }
+
+        .birthday-table td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #ecf3fa;
+            color: #1f2f3e;
+        }
+
+        .birthday-table tr:hover td {
+            background-color: #fafcff;
+        }
+
+        .highlight-today {
+            background: #fff1e6;
+            font-weight: 600;
+            border-left: 4px solid #ff7b2c;
+        }
+
+        .days-col {
+            font-weight: 600;
+            color: #2c6e9e;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 3rem;
+            color: #7b8ba3;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #6c7f9c;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .hero h1 { font-size: 1.7rem; }
+            .upcoming-header h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>🎂 Напоминалка Дня Рождения Отряда</h1>
+        <p>✨ Московское время • Всегда актуально ✨</p>
+        <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem;">
+            <div class="badge-date" id="currentMoscowDateDisplay"></div>
+            <div class="moscow-clock" id="moscowClock">⏱️ --:--:--</div>
+        </div>
+    </div>
+
+    <!-- Ближайшие дни рождения (по МСК) -->
+    <div class="upcoming-section" id="upcomingSection">
+        <div class="upcoming-header">
+            <h2>🎈 Ближайшие именинники</h2>
+            <span>⚠️ Следите за поздравлениями (по МСК)</span>
+        </div>
+        <div id="upcomingList" class="upcoming-grid"></div>
+    </div>
+
+    <!-- Панель управления полным списком -->
+    <div class="toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Поиск по ФИО..." autocomplete="off">
+        </div>
+        <div class="sort-group">
+            <button class="sort-btn" data-sort="calendar">📅 По дате (янв→дек)</button>
+            <button class="sort-btn active" data-sort="nextDays">⏳ По ближайшим событиям</button>
+        </div>
+        <div class="result-count" id="resultCount">показано: 0</div>
+    </div>
+
+    <!-- Полная таблица -->
+    <div class="table-wrapper">
+        <table class="birthday-table" id="fullTable">
+            <thead>
+                <tr><th>№</th><th>ФИО</th><th>Дата рождения</th><th>Возраст (лет)</th><th>До следующего ДР (МСК)</th></tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="5" class="empty-message">Загрузка данных...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <footer>🎉 Автоматическое обновление каждую минуту. Все даты рассчитаны по Москве (UTC+3). Сегодняшние именинники выделены.</footer>
+</div>
+
+<script>
+    // ---------- РАБОТА С МОСКОВСКИМ ВРЕМЕНЕМ (UTC+3) ----------
+    // Возвращает текущий момент времени в московской временной зоне (Date объект, но с коррекцией)
+    function getCurrentMoscowDate() {
+        const now = new Date();
+        // получаем UTC компоненты и прибавляем 3 часа
+        const utc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+        const mskTimestamp = utc + 3 * 60 * 60 * 1000;
+        return new Date(mskTimestamp);
+    }
+
+    // Возвращает дату "сегодня" в Москве (00:00:00 по МСК)
+    function getMoscowTodayMidnight() {
+        const mskNow = getCurrentMoscowDate();
+        const year = mskNow.getUTCFullYear();
+        const month = mskNow.getUTCMonth();
+        const day = mskNow.getUTCDate();
+        // создаём UTC дату, которая соответствует 00:00 по МСК (UTC+3)
+        // 00:00 MSK = 21:00 UTC предыдущего дня? проще сконструировать через Date.UTC
+        // Создаём дату в UTC, которая будет представлять полночь по московскому времени.
+        // Московская полночь = UTC 21:00 предыдущего дня. Но для корректных сравнений лучше создать Date в UTC,
+        // где компоненты соответствуют желаемой московской дате.
+        // Самый надёжный способ: создать строку и распарсить? Или задать явно.
+        // Для сравнения дней рождения достаточно иметь объект Date с правильными годом, месяцем, днём.
+        // Создаём Date в локальной среде, но принудительно выставляем UTC компоненты так, чтобы при чтении getUTCHours() было 0.
+        // Однако для расчёта разницы в днях удобнее использовать чистые UTC метки.
+        // Сделаем так: создаём дату в UTC, но сдвинутую на -3 часа, чтобы при приведении к UTC+3 получить полночь.
+        // Альтернативно: создаём объект Date с руками (year, month, day) и используем как "полночь по МСК" без временной составляющей.
+        // Для корректного вычисления разницы в днях будем использовать timestamp, приведённый к московской полночи.
+        const mskMidnightUTC = Date.UTC(year, month, day, 0, 0, 0) - (3 * 60 * 60 * 1000);
+        return new Date(mskMidnightUTC);
+    }
+
+    // Получить текущую дату в виде "YYYY-MM-DD" для сравнения с днём рождения (по Москве)
+    function getMoscowDateYMD() {
+        const msk = getCurrentMoscowDate();
+        const y = msk.getUTCFullYear();
+        const m = String(msk.getUTCMonth() + 1).padStart(2,'0');
+        const d = String(msk.getUTCDate()).padStart(2,'0');
+        return `${y}-${m}-${d}`;
+    }
+
+    // ----- ДАННЫЕ ОТРЯДА -----
+    const rawData = [
+        { id:1, lastName:"Халупко", firstName:"Татьяна", patronymic:"Витальевна", birthStr:"25.03.1999" },
+        { id:2, lastName:"Комков", firstName:"Илья", patronymic:"Владимирович", birthStr:"12.04.2003" },
+        { id:3, lastName:"Таболаева", firstName:"Александра", patronymic:"Владимировна", birthStr:"26.04.2002" },
+        { id:4, lastName:"Павлиди", firstName:"Светлана", patronymic:"Викторовна", birthStr:"14.05.2005" },
+        { id:5, lastName:"Костюкова", firstName:"Полина", patronymic:"Сергеевна", birthStr:"01.06.2006" },
+        { id:6, lastName:"Захарова", firstName:"Алиса", patronymic:"Денисовна", birthStr:"02.06.2006" },
+        { id:7, lastName:"Овчинников", firstName:"Глеб", patronymic:"Викторович", birthStr:"02.06.2004" },
+        { id:8, lastName:"Егоров", firstName:"Артемий", patronymic:"Витальевич", birthStr:"19.07.2005" },
+        { id:9, lastName:"Бориева", firstName:"Анастасия", patronymic:"Андреевна", birthStr:"05.08.2006" },
+        { id:10, lastName:"Тронь", firstName:"Сергей", patronymic:"Николаевич", birthStr:"06.08.2006" },
+        { id:11, lastName:"Яковлева", firstName:"Юлия", patronymic:"Дмитриевна", birthStr:"03.09.2006" },
+        { id:12, lastName:"Соломин", firstName:"Иван", patronymic:"Юрьевич", birthStr:"01.10.2006" },
+        { id:13, lastName:"Арефьев", firstName:"Дмитрий", patronymic:"Андреевич", birthStr:"11.10.2003" },
+        { id:14, lastName:"Павлова", firstName:"Валерия", patronymic:"Александровна", birthStr:"04.11.2006" },
+        { id:15, lastName:"Сорокин", firstName:"Арсений", patronymic:"Матвеевич", birthStr:"04.11.2007" },
+        { id:16, lastName:"Чепрунова", firstName:"Ульяна", patronymic:"Александровна", birthStr:"26.11.2004" }
+    ];
+
+    function parseBirthDate(dateStr) {
+        const parts = dateStr.split('.');
+        if(parts.length !== 3) return null;
+        const day = parseInt(parts[0],10);
+        const month = parseInt(parts[1],10)-1;
+        const year = parseInt(parts[2],10);
+        return { day, month, year };
+    }
+
+    // Вычисление следующего дня рождения (строго по московскому времени)
+    function getNextBirthdayInfoMsk(birthDay, birthMonth, birthYear) {
+        // сегодняшняя полночь по МСК (00:00:00)
+        const todayMidnightMsk = getMoscowTodayMidnight();
+        const currentYearMsk = todayMidnightMsk.getUTCFullYear();
+        const currentMonthMsk = todayMidnightMsk.getUTCMonth();
+        const currentDateMsk = todayMidnightMsk.getUTCDate();
+        
+        // Строим дату следующего ДР в виде UTC полуночи по МСК (т.е. целевая дата, где компоненты соответствуют дню рождения)
+        // Сначала пытаемся в текущем году
+        let nextBirthdayUTC = Date.UTC(currentYearMsk, birthMonth, birthDay, 0, 0, 0) - (3 * 60 * 60 * 1000);
+        let nextBirthdayDate = new Date(nextBirthdayUTC);
+        
+        // Если сегодняшняя полночь (МСК) уже больше или равна дате ДР в этом году, то берём следующий год
+        if (nextBirthdayDate <= todayMidnightMsk) {
+            nextBirthdayUTC = Date.UTC(currentYearMsk + 1, birthMonth, birthDay, 0, 0, 0) - (3 * 60 * 60 * 1000);
+            nextBirthdayDate = new Date(nextBirthdayUTC);
+        }
+        
+        // Вычисляем разницу в днях между сегодняшней полночью (МСК) и датой следующего ДР (полночь)
+        const diffTime = nextBirthdayDate - todayMidnightMsk;
+        const daysDiff = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Определяем возраст на сегодня (по МСК)
+        let currentAge = currentYearMsk - birthYear;
+        // Если день рождения в этом году ещё не наступил, уменьшаем возраст на 1
+        const thisYearBirthdayUTC = Date.UTC(currentYearMsk, birthMonth, birthDay, 0, 0, 0) - (3 * 60 * 60 * 1000);
+        const thisYearBirthday = new Date(thisYearBirthdayUTC);
+        if (thisYearBirthday > todayMidnightMsk) {
+            currentAge = currentYearMsk - birthYear - 1;
+        }
+        
+        const nextAge = nextBirthdayDate.getUTCFullYear() - birthYear;
+        const isToday = (daysDiff === 0);
+        
+        return { daysDiff, currentAge, nextAge, isToday, nextBirthdayDate };
+    }
+
+    // Обогащаем данные людей с учётом МСК
+    function enrichPeopleMsk(peopleArray) {
+        return peopleArray.map(person => {
+            const parsed = parseBirthDate(person.birthStr);
+            if(!parsed) return { ...person, fullName: `${person.lastName} ${person.firstName} ${person.patronymic}`, error: true };
+            const { day, month, year } = parsed;
+            const fullName = `${person.lastName} ${person.firstName} ${person.patronymic}`;
+            const birthFormatted = `${day.toString().padStart(2,'0')}.${(month+1).toString().padStart(2,'0')}.${year}`;
+            const nextInfo = getNextBirthdayInfoMsk(day, month, year);
+            return {
+                ...person,
+                fullName,
+                birthDay: day,
+                birthMonth: month,
+                birthYear: year,
+                birthFormatted,
+                daysToNext: nextInfo.daysDiff,
+                currentAge: nextInfo.currentAge,
+                nextAge: nextInfo.nextAge,
+                isToday: nextInfo.isToday,
+                nextBirthdayDate: nextInfo.nextBirthdayDate
+            };
+        });
+    }
+
+    let people = [];
+    let currentSort = "nextDays";
+    let searchQuery = "";
+
+    // Рендер блока "Ближайшие" (по МСК)
+    function renderUpcoming() {
+        const container = document.getElementById("upcomingList");
+        if(!container) return;
+        const upcomingList = [...people]
+            .filter(p => p.daysToNext >= 0)
+            .sort((a,b) => a.daysToNext - b.daysToNext)
+            .slice(0, 8);
+        if(upcomingList.length === 0) {
+            container.innerHTML = `<div class="empty-message" style="grid-column:1/-1;">🎁 Нет ближайших именинников...</div>`;
+            return;
+        }
+        let html = '';
+        for(let p of upcomingList) {
+            let daysText = '';
+            let badgeClass = 'days-badge';
+            if(p.daysToNext === 0) {
+                daysText = '🔥 СЕГОДНЯ (МСК)!';
+                badgeClass += ' today';
+            } else if(p.daysToNext === 1) daysText = '⏰ ЗАВТРА!';
+            else if(p.daysToNext <= 7) daysText = `⏳ через ${p.daysToNext} дн.`;
+            else daysText = `через ${p.daysToNext} дн.`;
+            html += `
+                <div class="birthday-card">
+                    <div class="card-icon">🎂</div>
+                    <div class="card-info">
+                        <h3>${escapeHtml(p.fullName)}</h3>
+                        <p>📅 ${p.birthFormatted} • исполнится ${p.nextAge} лет</p>
+                    </div>
+                    <div class="${badgeClass}">${daysText}</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
+    // Простой экранирование
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    function sortByCalendar(list) {
+        return [...list].sort((a,b) => {
+            if(a.birthMonth !== b.birthMonth) return a.birthMonth - b.birthMonth;
+            return a.birthDay - b.birthDay;
+        });
+    }
+    function sortByNextDays(list) {
+        return [...list].sort((a,b) => a.daysToNext - b.daysToNext);
+    }
+    function filterBySearch(list, query) {
+        if(!query.trim()) return list;
+        const q = query.trim().toLowerCase();
+        return list.filter(p => p.fullName.toLowerCase().includes(q));
+    }
+
+    function renderFullTable() {
+        let filtered = filterBySearch(people, searchQuery);
+        let sorted;
+        if(currentSort === "calendar") sorted = sortByCalendar(filtered);
+        else sorted = sortByNextDays(filtered);
+        
+        const tbody = document.getElementById("tableBody");
+        const resultSpan = document.getElementById("resultCount");
+        resultSpan.innerText = `показано: ${sorted.length} из ${people.length}`;
+        if(sorted.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-message">👀 Никого не найдено</td></tr>`;
+            return;
+        }
+        let rows = '';
+        sorted.forEach((p, idx) => {
+            const daysDisplay = p.daysToNext === 0 ? "🎉 СЕГОДНЯ!" : (p.daysToNext === 1 ? "✨ ЗАВТРА" : `${p.daysToNext} дн.`);
+            const highlight = p.isToday ? 'highlight-today' : '';
+            rows += `
+                <tr class="${highlight}">
+                    <td>${idx+1}</td>
+                    <td><strong>${escapeHtml(p.fullName)}</strong></td>
+                    <td>${p.birthFormatted}</td>
+                    <td>${p.currentAge}</td>
+                    <td class="days-col">${daysDisplay}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = rows;
+    }
+
+    // Обновить все данные (пересчитать по текущему московскому времени)
+    function refreshAllData() {
+        people = enrichPeopleMsk(rawData);
+        renderUpcoming();
+        renderFullTable();
+        updateMoscowUI();
+    }
+
+    // Обновить отображение даты и времени по МСК
+    function updateMoscowUI() {
+        const mskNow = getCurrentMoscowDate();
+        const year = mskNow.getUTCFullYear();
+        const month = String(mskNow.getUTCMonth() + 1).padStart(2,'0');
+        const day = String(mskNow.getUTCDate()).padStart(2,'0');
+        const hours = String(mskNow.getUTCHours()).padStart(2,'0');
+        const minutes = String(mskNow.getUTCMinutes()).padStart(2,'0');
+        const seconds = String(mskNow.getUTCSeconds()).padStart(2,'0');
+        const dateStr = `${day}.${month}.${year}`;
+        const timeStr = `${hours}:${minutes}:${seconds}`;
+        const dateElem = document.getElementById("currentMoscowDateDisplay");
+        const clockElem = document.getElementById("moscowClock");
+        if(dateElem) dateElem.innerHTML = `📆 Москва: ${dateStr}`;
+        if(clockElem) clockElem.innerHTML = `⏱️ ${timeStr} MSK`;
+    }
+
+    // Инициализация событий
+    function setupEvents() {
+        const searchInput = document.getElementById("searchInput");
+        if(searchInput) {
+            searchInput.addEventListener("input", (e) => {
+                searchQuery = e.target.value;
+                renderFullTable();
+            });
+        }
+        const btns = document.querySelectorAll(".sort-btn");
+        btns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const type = btn.getAttribute("data-sort");
+                if(type === "calendar") currentSort = "calendar";
+                else if(type === "nextDays") currentSort = "nextDays";
+                btns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                renderFullTable();
+            });
+        });
+    }
+
+    // Запуск таймера реального времени (каждую минуту обновляем данные и часы)
+    let timerInterval;
+    function startRealTimeUpdates() {
+        if(timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            refreshAllData();  // пересчитывает дни, isToday и т.д. по текущему МСК
+            updateMoscowUI();
+        }, 60000); // каждые 60 секунд
+        // также обновляем часы каждую секунду для красоты
+        setInterval(() => {
+            updateMoscowUI();
+        }, 1000);
+    }
+
+    function init() {
+        setupEvents();
+        refreshAllData();
+        startRealTimeUpdates();
+        // дополнительная проверка при фокусе вкладки
+        window.addEventListener('focus', () => {
+            refreshAllData();
+        });
+    }
+    init();
+</script>
+</body>
+</html>
